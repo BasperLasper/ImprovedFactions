@@ -119,7 +119,8 @@ class Faction(id: EntityID<Int>) : IntEntity(id) {
         }
         members().forEach { unsetUserData(it) }
         RelationsModule.deleteFactionRelations(id.value)
-        
+
+        Bukkit.getPluginManager().callEvent(FactionDeleteEvent(this))
         super.delete()
     }
 
@@ -205,6 +206,7 @@ class Faction(id: EntityID<Int>) : IntEntity(id) {
         )
 
         powerRaidModule().powerModuleHandle.memberJoin(this)
+        Bukkit.getPluginManager().callEvent(FactionJoinEvent(this, user))
     }
 
     fun invite(inviter: UUID, invited: UUID, rankId: Int): FactionInvite {
@@ -342,6 +344,7 @@ class Faction(id: EntityID<Int>) : IntEntity(id) {
                 "player" to (Bukkit.getOfflinePlayer(player).name ?: "unknown")
             )
         )
+        Bukkit.getPluginManager().callEvent(FactionLeaveEvent(this, user))
     }
 
     fun transferOwnership(newOwner: UUID) {

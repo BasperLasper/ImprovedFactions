@@ -17,6 +17,9 @@ import io.github.toberocat.improvedfactions.modules.power.PowerRaidsModule.power
 import io.github.toberocat.improvedfactions.modules.relations.RelationsModule
 import io.github.toberocat.improvedfactions.ranks.FactionRank
 import io.github.toberocat.improvedfactions.ranks.FactionRankHandler
+import io.github.toberocat.improvedfactions.api.events.FactionDeleteEvent
+import io.github.toberocat.improvedfactions.api.events.FactionJoinEvent
+import io.github.toberocat.improvedfactions.api.events.FactionLeaveEvent
 import io.github.toberocat.improvedfactions.ranks.listRanks
 import io.github.toberocat.improvedfactions.translation.LocalizationKey
 import io.github.toberocat.improvedfactions.translation.LocalizedException
@@ -113,6 +116,8 @@ class Faction(id: EntityID<Int>) : IntEntity(id) {
         members().forEach { unsetUserData(it) }
         RelationsModule.deleteFactionRelations(id.value)
 
+        Bukkit.getPluginManager().callEvent(FactionDeleteEvent(this))
+
         super.delete()
     }
 
@@ -194,6 +199,7 @@ class Faction(id: EntityID<Int>) : IntEntity(id) {
         )
 
         powerRaidModule().powerModuleHandle.memberJoin(this)
+        Bukkit.getPluginManager().callEvent(FactionJoinEvent(this, user))
     }
 
     fun invite(inviter: UUID, invited: UUID, rankId: Int): FactionInvite {
@@ -319,13 +325,14 @@ class Faction(id: EntityID<Int>) : IntEntity(id) {
     @Throws(PlayerIsOwnerLeaveException::class)
     fun leave(player: UUID) {
         if (owner == player) throw PlayerIsOwnerLeaveException()
-
-        unsetUserData(player.factionUser())
+        val user = player.factionUser()
+        unsetUserData(user)
         broadcast(
             "base.faction.player-left", mapOf(
                 "player" to (Bukkit.getOfflinePlayer(player).name ?: "unknown")
             )
         )
+        Bukkit.getPluginManager().callEvent(FactionLeaveEvent(this, user))
     }
 
     fun transferOwnership(newOwner: UUID) {

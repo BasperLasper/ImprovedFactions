@@ -129,6 +129,11 @@ const config: Config = {
                     ],
                 },
                 {
+                    to: 'docs/Api/getting-started',
+                    label: 'Api',
+                    position: 'left',
+                },
+                {
                     type: 'dropdown',
                     label: 'Community',
                     position: 'left',

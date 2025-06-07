@@ -107,6 +107,10 @@ class Faction(id: EntityID<Int>) : IntEntity(id) {
         }
 
     override fun delete() {
+        val event = FactionDeleteEvent(this)
+        Bukkit.getPluginManager().callEvent(event)
+        if (event.isCancelled()) return
+        
         BaseModule.claimChunkClusters.removeFactionClusters(this)
         DynmapModule.dynmapModule().dynmapModuleHandle.removeHome(this)
         listRanks().forEach { it.delete() }
@@ -115,9 +119,7 @@ class Faction(id: EntityID<Int>) : IntEntity(id) {
         }
         members().forEach { unsetUserData(it) }
         RelationsModule.deleteFactionRelations(id.value)
-
-        Bukkit.getPluginManager().callEvent(FactionDeleteEvent(this))
-
+        
         super.delete()
     }
 
@@ -187,6 +189,10 @@ class Faction(id: EntityID<Int>) : IntEntity(id) {
         if (isBanned(user))
             throw CommandException("base.exceptions.you-are-banned", emptyMap())
 
+        val event = FactionJoinEvent(this, user)
+        Bukkit.getPluginManager().callEvent(event)
+        if (event.isCancelled()) return
+        
         user.factionId = id.value
         user.assignedRank = rankId
 
@@ -199,7 +205,6 @@ class Faction(id: EntityID<Int>) : IntEntity(id) {
         )
 
         powerRaidModule().powerModuleHandle.memberJoin(this)
-        Bukkit.getPluginManager().callEvent(FactionJoinEvent(this, user))
     }
 
     fun invite(inviter: UUID, invited: UUID, rankId: Int): FactionInvite {
@@ -325,14 +330,18 @@ class Faction(id: EntityID<Int>) : IntEntity(id) {
     @Throws(PlayerIsOwnerLeaveException::class)
     fun leave(player: UUID) {
         if (owner == player) throw PlayerIsOwnerLeaveException()
+        
         val user = player.factionUser()
+        val event = FactionLeaveEvent(this, user)
+        Bukkit.getPluginManager().callEvent(event)
+        if (event.isCancelled()) return
+        
         unsetUserData(user)
         broadcast(
             "base.faction.player-left", mapOf(
                 "player" to (Bukkit.getOfflinePlayer(player).name ?: "unknown")
             )
         )
-        Bukkit.getPluginManager().callEvent(FactionLeaveEvent(this, user))
     }
 
     fun transferOwnership(newOwner: UUID) {

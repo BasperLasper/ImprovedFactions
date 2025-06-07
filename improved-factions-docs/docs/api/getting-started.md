@@ -41,4 +41,10 @@ transaction {
 
 For java usage, one has to check jetbrains exposed documentation
 
+### Further docs
+
+<a href="/api/index.html" target="_blank" rel="noopener noreferrer">Browse full API documentation</a>
+
+### Get help
+
 For support, visit the [Improved Factions Discord](https://discord.com/invite/VmSbFNZejz) or open an issue on [GitHub](https://github.com/ToberoCat/ImprovedFactions).

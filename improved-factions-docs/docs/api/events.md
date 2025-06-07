@@ -1,4 +1,4 @@
-## Faction Events
+# Faction Events
 
 The plugin emits several Bukkit events related to faction lifecycle changes. You can listen to them using the standard
 Bukkit event system (`@EventHandler`).

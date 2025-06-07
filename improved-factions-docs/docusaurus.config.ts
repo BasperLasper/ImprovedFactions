@@ -143,6 +143,7 @@ const config: Config = {
                     label: 'Api',
                     position: 'left',
                 },
+
                 {
                     type: 'dropdown',
                     label: 'Community',

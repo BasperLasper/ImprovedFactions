@@ -314,7 +314,16 @@ class Faction(id: EntityID<Int>) : IntEntity(id) {
         if (isBanned(user))
             throw CommandException("base.exceptions.already-banned", emptyMap())
 
+        // DEFENSIVE: Only allow banning players who are in this faction
+        if (user.factionId != id.value) {
+            throw CommandException("base.exceptions.player-not-in-faction", emptyMap())
+        }
+
         if (user.factionId == id.value) {
+            user.player()?.sendLocalized(
+                "base.faction.you-were-banned",
+                mapOf("faction" to name)
+            )
             unsetUserData(user)
         }
 
